@@ -5,13 +5,9 @@
 using namespace std;
 
 Circulo::Circulo(const string& nome, double raio) : Forma(nome), raio(raio) {
-    try { 
-        if (this->raio < 0) {
-            throw "valor negativo";
+    if (this->raio < 0) {
+            throw invalid_argument("A medida não deve ser um valor negativo");
         }
-    } catch (const string& erro) {
-        cout << "Erro: a medida não deve ser um " << erro;
-    }
 };
 
 double PI = M_PI;
@@ -30,13 +26,10 @@ string Circulo::descricao() const {
 };
 
 Circulo Circulo::operator+(const Circulo& outro) const { 
-    // try (
-    //     if (outro.)
-    // )
     return Circulo("novo_circulo", (this->raio + outro.raio));
 };
 
-Circulo Circulo::operator*=(double escala) {  
+Circulo& Circulo::operator*=(double escala) {  
     try {
         if (escala <= 0) {
             throw "valor inválido";
@@ -59,4 +52,4 @@ bool Circulo::operator==(const Circulo& outro) const {
     return (this->area() == outro.area());
 }
 
-// operator<<
+// ostream& 

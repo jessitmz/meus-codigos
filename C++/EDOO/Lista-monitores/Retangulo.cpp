@@ -1,16 +1,14 @@
 #include "Retangulo.h"
 #include <iostream>
+#include <stdexcept>
 
 using namespace std;
 
 Retangulo::Retangulo(const string& nome, double largura, double altura) : Forma(nome), largura(largura), altura(altura) {
-    try { 
+    
         if (this->largura < 0 || this->altura < 0) {
-            throw "valor negativo";
+            throw invalid_argument("A medida não deve ser um valor negativo");
         }
-    } catch (string erro) {
-        cout << "Erro: a medida não deve ser um " << erro;
-    }
 };
 
 double Retangulo::area() const {
