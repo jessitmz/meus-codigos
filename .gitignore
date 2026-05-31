@@ -3,6 +3,8 @@
 
 # Executáveis (Linux - nome que demos ao compilar)
 main
+.cph
+
 # nome padrão para executaveis é executavel
 
 # Pastas de configuração do VS Code (opcional)
