@@ -1,120 +1,107 @@
-#include <vector>
-#include <string>
+// open hashing
 #include <iostream>
+#include <string>
+#include <vector>
+#include <list>
 
 using namespace std;
 
+class Entry {
+
+    public:
+        string key;
+        string value;
+
+        Entry(string k, string v) : key(k), value(v) {}
+
+};
+
 class HashTable {
-    
+
     private:
+        int m;
+        int cnt;
+        vector<list<Entry>> H;
 
-        int numElements;
-        string table[101];
+        int h(string K) { // sfold
+            int intLength = K.length() / 4;
+            long long sum = 0;
 
-        int hashFunction(string key) {
-            long long h = 0;
-            for (int i = 0; i < key.length(); i++) {
-                h += (long long)key[i] * (i + 1);
+            for (int i = 0; i < intLength; i++) {
+                string sub = K.substr(i * 4, 4);
+                long long mult = 1;
+
+                for (int j = 0; j < 4; j++) {
+                    sum += sub[j] * mult;
+                    mult *= 256;
+                }
             }
-            return ((19 * h) % 101);
-        }
-        
-        int getProbingPosition(int originalHash, int j) {
-            return ((originalHash + (j * j) + (23 * j)) % 101);
+
+            string sub = K.substr(intLength * 4);
+            int mult = 1;
+            int s = sub.length();
+            for (int j = 0; j < s - 1; j++) {
+                sum += sub[j] * mult;
+                mult *= 256;
+            }
+
+            return abs(sum) % m;
         }
 
     public:
-        
-        HashTable() {
-            numElements = 0;
-            for (int i = 0; i < 101; i++) {
-                table[i] = "";
-            }
-        }
+        HashTable(int size) : m(size), cnt(0) { H.resize(m); }
 
-        int find(const string& key) {
-            int originalHash = hashFunction(key);
+        string find(string key) {
+            int pos = h(key);
 
-            for (int j = 0; j <= 19; j++) {
-                int pos = getProbingPosition(originalHash, j);
-
-                if (table[pos] == key) {
-                    return pos;
-                }
-                if (table[pos] == "") {
-                    return -1; // encontrou um espaço vazio válido, logo a chave não está na tabela
+            for (auto it = H[pos].begin(); it != H[pos].end(); ++it) {
+                if (it->key == key) {
+                    return it->value;
                 }
             }
-            return -1; // não encontrou após 20 tentativas
+            return "";
         }
 
-        void insert(const string& key) {
-
-            if (find(key) != -1) {
-                return;
-            }
-
-            int originalHash = hashFunction(key);
-
-            for (int j = 0; j <= 19; j++) {
-                int pos = getProbingPosition(originalHash, j);
-
-                if (table[pos] == "" || table[pos] == "#DELETED#") {
-                    table[pos] = key;
-                    numElements++;
-                    return;
-                }
-            }
-        }
-
-        void remove(const string& key) {
-            int pos = find(key);
-
-            if (pos != -1) {
-                table[pos] = "#DELETED#";
-                numElements--;
-            }
-        }
-
-        void print() {
-            cout << numElements << "\n";
-            for (int i = 0; i < 101; i++) {
-                if (table[i] != "" && table[i] != "#DELETED#") {
-                    cout << i << ":" << table[i] << "\n";
-                }
+        void insert(string key, string value) {
+            if (find(key) == "") {
+                int pos = h(key);
+                H[pos].push_back(Entry(key, value));
+                cnt++;
             }
         }
 };
 
 int main() {
-    
-    int t;
-    cin >> t;
-    while (t > 0) {
 
-        int n;
-        cin >> n;
-        HashTable ht;
+    HashTable dict(100003);
 
-        for (int i = 0; i < n; i++) {
-            string op;
-            cin >> op;
+    string line;
 
-            string cmd = op.substr(0, 3);
+    while (getline(cin, line) && line != "") {
 
-            string key = op.substr(4);
+        int spacePos = line.find(" ");
 
-            if (cmd == "ADD") {
-                ht.insert(key);
-            }
-            else if (cmd == "DEL") {
-                ht.remove(key);
-            }
+        if (spacePos > 0) {
+
+            string english, foreing;
+            english = line.substr(0, spacePos);
+            foreing = line.substr(spacePos + 1);
+
+            dict.insert(foreing, english);
         }
+    }
 
-        ht.print();
+    string word;
+    
+    while (cin >> word) {
+        string translated = dict.find(word);
 
-        t--;
+        if (translated != "") {
+            cout << translated << "\n";
+        }
+        else {
+            cout << "eh\n";
+        }
     }
 
     return 0;
